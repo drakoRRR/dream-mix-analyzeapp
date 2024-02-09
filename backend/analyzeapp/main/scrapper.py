@@ -13,8 +13,11 @@ class ScrapperBase:
 
         self.url = ''
 
-    def get_main_colors(self):
-        response = requests.get(self.url, headers=self.headers).text
+    def get_main_colors(self, url=None):
+        if url:
+            response = requests.get(url, headers=self.headers).text
+        else:
+            response = requests.get(self.url, headers=self.headers).text
 
         soup = BeautifulSoup(response, 'html.parser')
 
@@ -34,11 +37,13 @@ class ScrapperBase:
         colors_dict = [{'color': color, 'count': count} for color, count in color_counts.most_common()]
         return colors_dict
 
-    def find_most_common_word(self):
-        response = requests.get(self.url, headers=self.headers)
-        html_content = response.text
+    def find_most_common_word(self, url=None):
+        if url:
+            response = requests.get(url, headers=self.headers).text
+        else:
+            response = requests.get(self.url, headers=self.headers).text
 
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(response, 'html.parser')
 
         text = " ".join([tag.get_text() for tag in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
         words = re.findall(r'\b\w{5,}\b', text.lower())

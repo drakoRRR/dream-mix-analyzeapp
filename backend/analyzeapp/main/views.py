@@ -12,7 +12,5 @@ class GetDouInformation(views.APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        print(GetScrapeDou().find_most_common_word())
-
-        return Response(dict(result='ok'), status=status.HTTP_200_OK)
+        return Response(data=GetScrapeDou().popular_posts(), status=status.HTTP_200_OK)
 

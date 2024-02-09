@@ -14,3 +14,6 @@ class GetDouInformation(views.APIView):
     def get(self, request):
         return Response(data=GetScrapeDou().popular_posts(), status=status.HTTP_200_OK)
 
+    def post(self, request):
+        return Response(data=GetScrapeDou().analyze_search(request.data['search']), status=status.HTTP_200_OK)
+

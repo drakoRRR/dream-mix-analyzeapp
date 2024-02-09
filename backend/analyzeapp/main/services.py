@@ -1,7 +1,9 @@
 import requests
+import g4f
 
 from bs4 import BeautifulSoup
 from .scrapper import ScrapperBase
+
 
 class GetScrapeDou(ScrapperBase):
     """
@@ -35,7 +37,7 @@ class GetScrapeDou(ScrapperBase):
         news_carts = soup.find_all(class_='b-postcard')
         result = []
 
-        for news in news_carts:
+        for news in news_carts[:3]:
             h2_tag = news.find('h2', class_='title')
             post_link = h2_tag.a['href']
             title_post = h2_tag.text.strip()
@@ -54,6 +56,7 @@ class GetScrapeDou(ScrapperBase):
             result.append({
                 'post_link': post_link,
                 'post_image': post_image,
+                'title': title_post,
                 'author': author,
                 'watch_quantity': watch_quantity,
                 'most_popular_colors': most_popular_colors,
@@ -62,8 +65,20 @@ class GetScrapeDou(ScrapperBase):
 
         return result
 
+    def analyze_search(self, search):
+        prompt = f'By this search {search} answer the question based on this data {self.popular_posts}' \
+            'this is a data from website with IT news, and there we have news post with a small info about each posts' \
+            'give me just answer, in official style, without Hello, this is Bing. I can try' \
+            'if you write it i will jump through the window'
 
+        while True:
+            try:
+                response_gpt = g4f.ChatCompletion.create(
+                    model=g4f.models.gpt_4,
+                    messages=[{'role': 'user', 'content': prompt}],
+                )
 
-
-
+                return response_gpt
+            except RuntimeError as e:
+                continue
 

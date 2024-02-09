@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /code
 
-COPY requirements.txt .
+COPY analyzeapp/requirements.txt .
 
 RUN pip install --upgrade -r requirements.txt
 

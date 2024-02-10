@@ -1,0 +1,25 @@
+const categories = [
+    "Java",
+    ".NET",
+    "PHP",
+    "C++",
+    "QA",
+    "Project Manager",
+    "Product Manager",
+    "HR",
+    "Sales",
+    "Analyst",
+    "За кордоном",
+    "Python",
+    "Ruby",
+    "Golang",
+    "iOS/macOS",
+    "Android",
+    "Front End",
+    "Node.js",
+    "Design",
+    "Marketing",
+    "DevOps",
+    "Початківцям"
+];
+export default categories;

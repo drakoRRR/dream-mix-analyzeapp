@@ -4,11 +4,11 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /code
 
-COPY analyzeapp/requirements.txt .
+COPY requirements.txt .
 
 RUN pip install --upgrade -r requirements.txt
 
-COPY ./weatherapp /code
+COPY ./analyzeapp /code
 
 EXPOSE 8000
 

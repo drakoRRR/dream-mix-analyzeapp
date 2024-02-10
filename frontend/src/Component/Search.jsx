@@ -65,7 +65,7 @@ export const Search = () => {
 
     const handleVacancies = async (language) => {
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/get-dou-vacancies/', {
+            const res = await axios.get('http://127.0.0.1:8000/api/get-dou-vacancies/', {
                 category: language
             });
 
@@ -83,7 +83,7 @@ export const Search = () => {
 
     const handleNews = async () => {
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/get-dou-news/');
+            const res = await axios.get('http://127.0.0.1:8000/api/get-dou-news/');
 
             if (res.status !== 200) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
@@ -98,11 +98,30 @@ export const Search = () => {
     };
 
 
-    const handleSelectChange = (event) => {
+    const handleSelectChange = async (event) => {
         const value = event.target.value;
         setSelectedOption(value);
-        handleVacancies(value);
+        if (value) {
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/get-dou-vacancies/', {
+                    category: value
+                });
+
+                if (res.status !== 200) {
+                    throw new Error(`HTTP error! Status: ${res.status}`);
+                }
+
+                const vacancies = res.data;
+                setSelectedVacancies(vacancies);
+                console.log('Fetched Vacancies:', vacancies);
+            } catch (error) {
+                console.error('Error fetching vacancies data:', error);
+            }
+        } else {
+            setSelectedVacancies([]); // Якщо вибрано "Select programming language", очистити список вакансій
+        }
     };
+
 
     return (
         <div>
@@ -174,6 +193,22 @@ export const Search = () => {
                         </Link>
                     </div>
                 ))}
+            </div>
+
+            <div className="container mt-7">
+                <div className="row">
+                    {selectedVacancies.map((vacancyGroup, index) => (
+                        <React.Fragment key={index}>
+                            <div className="col-12 mb-4">
+                                <h4>{vacancyGroup.category}</h4>
+                                <p>{vacancyGroup.qty_vacancies}</p>
+                            </div>
+                            {vacancyGroup.vacancies_list.map((item, idx) => (
+                                <VacancyCard key={idx} vacancy={item} />
+                            ))}
+                        </React.Fragment>
+                    ))}
+                </div>
             </div>
 
 

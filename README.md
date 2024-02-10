@@ -15,3 +15,5 @@ docker-compose up -d --build
 ```
 
 By this url you can achive the site http://127.0.0.1:3000/
+
+Site about collecting vacancies from different sites and ability to analyze this data

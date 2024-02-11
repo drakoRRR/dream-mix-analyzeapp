@@ -32,7 +32,7 @@ export const Search = () => {
 
     const handleSearchSubmit = (event) => {
         event.preventDefault();
-        const regex = new RegExp(searchQuery); 
+        const regex = new RegExp(searchQuery); // 'i' flag for case-insensitive matching
         const filteredVacancies = vacanciesData.filter(vacancyGroup => {
             return vacancyGroup.vacancies_list.some(item =>
                 regex.test(item.vacancy_title) ||
@@ -45,7 +45,7 @@ export const Search = () => {
     const handleSearchChange = (event) => {
         const value = event.target.value;
         setSearchQuery(value);
-        const regex = new RegExp(value); 
+        const regex = new RegExp(value); // 'i' flag for case-insensitive matching
         const options = vacanciesData
             .flatMap(group => group.vacancies_list)
             .filter(item =>
@@ -54,7 +54,6 @@ export const Search = () => {
             );
         setSearchOptions(options);
     };
-    
 
     const handleCheckboxChange = (event) => {
         const value = event.target.value;
@@ -65,7 +64,7 @@ export const Search = () => {
         }
     };
 
-
+    
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
@@ -102,25 +101,6 @@ export const Search = () => {
         filterVacancies();
     }, [socialMedia, selectedOption]);
 
-
-
-    const handleNews = async () => {
-        try {
-            const res = await axios.get('http://127.0.0.1:8000/api/get-dou-news/');
-
-            if (res.status !== 200) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-
-            const news = res.data;
-            setSocialMedia(news);
-            console.log('Fetched Vacancies:', news);
-        } catch (error) {
-            console.error('Error fetching vacancies data:', error);
-        }
-    };useEffect(() => {
-        handleNews();
-    }, []);
     return (
         <div>
             <Header />
@@ -145,42 +125,7 @@ export const Search = () => {
                     <input className="form-check-input" type="checkbox" id="vacanciesCheckbox" value="vacancies" onChange={handleCheckboxChange} />
                     <label className="form-check-label" htmlFor="vacanciesCheckbox">Dou vacancies</label>
                 </div>
-
-
-                <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" id="facebookCheckbox" value="facebook" onChange={handleCheckboxChange} />
-                    <label className="form-check-label" htmlFor="facebookCheckbox">Facebook</label>
-                </div>
-
-                <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" id="twitterCheckbox" value="twitter" onChange={handleCheckboxChange} />
-                    <label className="form-check-label" htmlFor="twitterCheckbox">Twitter</label>
-                </div>
-
-                <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" id="instagramCheckbox" value="instagram" onChange={handleCheckboxChange} />
-                    <label className="form-check-label" htmlFor="instagramCheckbox">Instagram</label>
-                </div>
             </div>
-
-
-            <div className="work-section-bottom">
-                {socialMedia.includes("dou") && socialMedia.map((data, index) => (
-                    <div className="work-section-info" key={index}>
-                        <div className="info-boxes-img-container">
-                            <img src={data.post_image} alt="" />
-                        </div>
-                        <p> </p>
-                        <h6>{data.title}</h6>
-                        <h3>{data.author}</h3>
-                        <a href={data.post_link} className="nav-link text-dark fw-bold">Посилання на джерело</a>
-                        <p>Кількість переглядів: {data.watch_quantity}</p>
-                        <Link to={{ pathname: `/item/${data.id}`, state: { detail: data } }}>
-                            <button className="secondary-button-item">View More</button>
-                        </Link>
-                    </div>
-                ))}
-            </div>  
 
             {socialMedia.includes("vacancies") && (
                 <select className="secondary-button" onChange={handleSelectChange}>
@@ -192,7 +137,7 @@ export const Search = () => {
             )}
 
 
-            <div className="work-section-bottom">
+<div className="work-section-bottom">
                 {socialMedia.includes("dou") && Data.map((data, index) => (
                     <div className="work-section-info" key={index}>
                         <div className="info-boxes-img-container">
@@ -223,6 +168,14 @@ export const Search = () => {
                 </div>
             </div>
 
+            {/* <div className="d-flex justify-content-center mt-3">
+                <h5>Select Programming Language:</h5>
+                <div className="d-flex flex-wrap">
+                    {programmingLanguages.map((language, index) => (
+                        <button key={index} className="btn btn-secondary mx-2 my-1" onClick={() => handleLanguageClick(language)}>{language}</button>
+                    ))}
+                </div>
+            </div> */}
 
             <div className="work-section-bottom">
                 {searchOptions.map((option, index) => (

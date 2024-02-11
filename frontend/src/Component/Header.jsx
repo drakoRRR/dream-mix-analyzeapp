@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../img/logo.png';
+import logo from '../img/logo.jpg';
 
 export const Header = () => {
     return (
@@ -9,7 +9,7 @@ export const Header = () => {
             </a>
             <ul className="nav mx-5 col-12 col-md-auto mb-2 justify-content-center mb-md-0 fs-5">
                 <li className="nav-item"><a href="#" className="nav-link active text-dark fw-bold" aria-current="page">Home</a></li>
-                <li className="nav-item"><a href="#" className="nav-link text-dark fw-bold">Diagrams</a></li>
+                {/* <li className="nav-item"><a href="#" className="nav-link text-dark fw-bold">Diagrams</a></li> */}
             </ul>
             
         </header>

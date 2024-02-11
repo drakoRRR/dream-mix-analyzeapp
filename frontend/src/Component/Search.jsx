@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Data from "../Component/Data";
+import vacanciesData from "../Component/Vacancies";
 import axios from 'axios';
 
+import ItemPage from './ItemPage';
 import { Link } from 'react-router-dom';
 import { Header } from './Header';
-import categories from './Categories';
 
 const VacancyCard = ({ vacancy }) => {
     return (
@@ -21,7 +22,6 @@ const VacancyCard = ({ vacancy }) => {
     );
 };
 
-
 export const Search = () => {
     const [socialMedia, setSocialMedia] = useState([]);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -30,15 +30,31 @@ export const Search = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchOptions, setSearchOptions] = useState([]);
 
-
     const handleSearchSubmit = (event) => {
         event.preventDefault();
+        const regex = new RegExp(searchQuery); 
+        const filteredVacancies = vacanciesData.filter(vacancyGroup => {
+            return vacancyGroup.vacancies_list.some(item =>
+                regex.test(item.vacancy_title) ||
+                regex.test(item.category)
+            );
+        });
+        setSelectedVacancies(filteredVacancies);
     };
-
+    
     const handleSearchChange = (event) => {
         const value = event.target.value;
         setSearchQuery(value);
+        const regex = new RegExp(value); 
+        const options = vacanciesData
+            .flatMap(group => group.vacancies_list)
+            .filter(item =>
+                regex.test(item.vacancy_title) ||
+                regex.test(item.vacancy_description)
+            );
+        setSearchOptions(options);
     };
+    
 
     const handleCheckboxChange = (event) => {
         const value = event.target.value;
@@ -49,37 +65,44 @@ export const Search = () => {
         }
     };
 
-    const filterVacancies = () => { };
+
+
+    const handleSelectChange = (event) => {
+        const value = event.target.value;
+        setSelectedOption(value);
+    };
+
+
+
+    const filterVacancies = () => {
+        let filteredVacancies = [];
+        if (socialMedia.includes("vacancies")) {
+            if (selectedOption) {
+                filteredVacancies = vacanciesData.filter(vacancyGroup => {
+                    return vacancyGroup.category.toLowerCase() === selectedOption.toLowerCase();
+                });
+            } else {
+                filteredVacancies = vacanciesData;
+            }
+        }
+        setSelectedVacancies(filteredVacancies);
+    };
+
 
     const handleLanguageClick = (language) => {
         setSelectedLanguage(language);
+        const filteredVacancies = vacanciesData.filter(vacancyGroup => {
+            return vacancyGroup.vacancies_list && vacancyGroup.vacancies_list.some(item =>
+                item.languages && item.languages.includes(language)
+            );
+        });
+        setSelectedVacancies(filteredVacancies);
     };
-
-    useEffect(() => {
-        handleNews();
-    }, []);
-
     useEffect(() => {
         filterVacancies();
     }, [socialMedia, selectedOption]);
 
-    const handleVacancies = async (language) => {
-        try {
-            const res = await axios.get('http://127.0.0.1:8000/api/get-dou-vacancies/', {
-                category: language
-            });
 
-            if (res.status !== 200) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-
-            const vacancies = res.data;
-            setSelectedVacancies(vacancies);
-            console.log('Fetched Vacancies:', vacancies);
-        } catch (error) {
-            console.error('Error fetching vacancies data:', error);
-        }
-    };
 
     const handleNews = async () => {
         try {
@@ -95,34 +118,9 @@ export const Search = () => {
         } catch (error) {
             console.error('Error fetching vacancies data:', error);
         }
-    };
-
-
-    const handleSelectChange = async (event) => {
-        const value = event.target.value;
-        setSelectedOption(value);
-        if (value) {
-            try {
-                const res = await axios.post('http://127.0.0.1:8000/api/get-dou-vacancies/', {
-                    category: value
-                });
-
-                if (res.status !== 200) {
-                    throw new Error(`HTTP error! Status: ${res.status}`);
-                }
-
-                const vacancies = res.data;
-                setSelectedVacancies(vacancies);
-                console.log('Fetched Vacancies:', vacancies);
-            } catch (error) {
-                console.error('Error fetching vacancies data:', error);
-            }
-        } else {
-            setSelectedVacancies([]); // Якщо вибрано "Select programming language", очистити список вакансій
-        }
-    };
-
-
+    };useEffect(() => {
+        handleNews();
+    }, []);
     return (
         <div>
             <Header />
@@ -166,17 +164,6 @@ export const Search = () => {
             </div>
 
 
-            {socialMedia.includes("vacancies") && (
-                <select className="secondary-button" onChange={handleSelectChange}>
-                    <option value="">Select programming language</option>
-                    {categories.map((category, index) => (
-                        <option key={index} value={category}>{category}</option>
-                    ))}
-                </select>
-            )}
-
-
-
             <div className="work-section-bottom">
                 {socialMedia.includes("dou") && socialMedia.map((data, index) => (
                     <div className="work-section-info" key={index}>
@@ -193,16 +180,41 @@ export const Search = () => {
                         </Link>
                     </div>
                 ))}
+            </div>  
+
+            {socialMedia.includes("vacancies") && (
+                <select className="secondary-button" onChange={handleSelectChange}>
+                    <option value="">Select programming language</option>
+                    {vacanciesData.map((vacancyGroup, index) => (
+                        <option key={index} value={vacancyGroup.category}>{vacancyGroup.category}</option>
+                    ))}
+                </select>
+            )}
+
+
+            <div className="work-section-bottom">
+                {socialMedia.includes("dou") && Data.map((data, index) => (
+                    <div className="work-section-info" key={index}>
+                        <div className="info-boxes-img-container">
+                            <img src={data.post_image} alt="" />
+                        </div>
+                        <p> </p>
+                        <h6>{data.title}</h6>
+                        <h3>{data.author}</h3>
+                        <a href={data.post_link} className="nav-link text-dark fw-bold">Посилання на джерело</a>
+                        <p>Кількість переглядів: {data.watch_quantity}</p>
+                        <Link to={{ pathname: `/item/${data.id}`, state: { detail: data } }}>
+                            <button className="secondary-button-item">View More</button>
+                        </Link>
+                    </div>
+                ))}
             </div>
+
 
             <div className="container mt-7">
                 <div className="row">
                     {selectedVacancies.map((vacancyGroup, index) => (
                         <React.Fragment key={index}>
-                            <div className="col-12 mb-4">
-                                <h4>{vacancyGroup.category}</h4>
-                                <p>{vacancyGroup.qty_vacancies}</p>
-                            </div>
                             {vacancyGroup.vacancies_list.map((item, idx) => (
                                 <VacancyCard key={idx} vacancy={item} />
                             ))}
@@ -211,18 +223,6 @@ export const Search = () => {
                 </div>
             </div>
 
-
-            <div className="container mt-7">
-                <div className="row">
-                    {socialMedia.includes("vacancies") && selectedVacancies.map((vacancyGroup, index) => (
-                        <React.Fragment key={index}>
-                            {vacancyGroup.vacancies_list.map((item, idx) => (
-                                <VacancyCard key={idx} vacancy={item} />
-                            ))}
-                        </React.Fragment>
-                    ))}
-                </div>
-            </div>
 
             <div className="work-section-bottom">
                 {searchOptions.map((option, index) => (
